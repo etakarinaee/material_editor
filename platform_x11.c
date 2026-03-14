@@ -31,6 +31,8 @@ material_editor_result platform_initialize(struct platform *platform) {
         GLX_DEPTH_SIZE, 24,
         GLX_STENCIL_SIZE, 8,
         GLX_DOUBLEBUFFER, True,
+        GLX_SAMPLE_BUFFERS, 1,
+        GLX_SAMPLES, 4,
         None
     };
 

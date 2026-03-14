@@ -129,4 +129,13 @@ static inline struct matrix4 matrix4_multiply(const struct matrix4 a, const stru
     return r;
 }
 
+static inline struct matrix4 matrix4_scale_xyz(const float x, const float y, const float z) {
+    struct matrix4 r = {0};
+    r.m[0] = x;
+    r.m[5] = y;
+    r.m[10] = z;
+    r.m[15] = 1.0f;
+    return r;
+}
+
 #endif //MATERIAL_EDITOR_MATH_H
