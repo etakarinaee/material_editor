@@ -17,8 +17,6 @@ int main(void) {
         gl_clear(0.1f, 0.1f, 0.1f, GL_OPAQUE);
     }
 
-    // TODO: opengl context
-    // TODO: clear color
     // TODO: draw a sphere
     // TODO: draw text
     // TODO: basic text editor
