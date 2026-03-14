@@ -3,9 +3,18 @@
 
 #include <stdbool.h>
 
+#include "result.h"
+
 #ifdef __linux__
 #include <X11/Xlib.h>
+#include <GL/glx.h>
 #endif
+
+struct gl {
+#ifdef __linux__
+    GLXContext context;
+#endif
+};
 
 struct platform {
 #ifdef __linux__
@@ -13,24 +22,20 @@ struct platform {
     Window window;
     // to handle the polite quit request properly and not be killed by SIGTERM
     Atom wm_delete_window;
+    Colormap colormap;
 #endif
+
+    struct gl gl;
 
     int width;
     int height;
 };
 
-#define PLATFORM_SUCCESS 0
-
-#define PLATFORM_ERROR_UNKNOWN (-1)
-#define PLATFORM_ERROR_OUT_OF_MEMORY (-2)
-
-typedef int platform_result;
-
-const char *platform_result_to_string(platform_result result);
-
-platform_result platform_initialize(struct platform *platform);
+material_editor_result platform_initialize(struct platform *platform);
 
 bool platform_update(struct platform *platform);
+
+void platform_swap_buffers(const struct platform *platform);
 
 void platform_quit(const struct platform *platform);
 
