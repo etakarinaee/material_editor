@@ -69,12 +69,15 @@ int main(void) {
         gl_font_draw(&font, text_editor.buffer, text_x, text_y, 0.3125f,
                      vector3(1.0f, 1.0f, 1.0f), platform.width, platform.height);
 
+        gl_font_draw_cursor(&font, text_editor.buffer, text_editor.cursor,
+                            text_x, text_y, 0.3125f,
+                            vector3(1.0f, 1.0f, 1.0f), platform.width, platform.height);
+
         gl_clear_scissor();
 
         platform_swap_buffers(&platform);
     }
 
-    // TODO: draw cursor
     // TODO: cursor movement
     // TODO: line numbers
     // TODO: mouse interaction

@@ -6,6 +6,7 @@
 struct text_editor {
     char buffer[TEXT_EDITOR_MAX_SIZE];
     int length;
+    int cursor;
 };
 
 void text_editor_initialize(struct text_editor *text_editor);

@@ -36,6 +36,8 @@ struct gl_font {
     int atlas_width;
     int atlas_height;
     struct gl_glyph glyphs[128];
+    // used for the cursor
+    float line_height;
 
     unsigned int program;
     unsigned int vao;
@@ -47,6 +49,15 @@ struct gl_font {
 material_editor_result gl_font_initialize(struct gl_font *font, const char *ttf, int pixel_height);
 
 void gl_font_draw(const struct gl_font *font, const char *string, float x, float y, float scale, struct vector3 color,
+                  int screen_width, int screen_height);
+
+void gl_font_draw_cursor(const struct gl_font *font, const char *string, int cursor,
+                         float x, float y, float scale,
+                         struct vector3 color,
+                         int screen_width, int screen_height);
+
+void gl_draw_rect(float x, float y, float width, float height,
+                  struct vector3 color,
                   int screen_width, int screen_height);
 
 void gl_initialize(void);

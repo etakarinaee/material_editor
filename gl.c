@@ -193,6 +193,8 @@ material_editor_result gl_font_initialize(struct gl_font *font, const char *ttf,
         xoffset += glyph_width + GLYPH_PADDING;
     }
 
+    font->line_height = (float) font->glyphs['A'].height * 1.3f;
+
     glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
     glBindTexture(GL_TEXTURE_2D, 0);
 
@@ -310,6 +312,134 @@ void gl_font_draw(const struct gl_font *font, const char *string, float x, float
     glDisable(GL_BLEND);
 }
 
+void gl_font_draw_cursor(const struct gl_font *font, const char *string, int cursor, float x, float y,
+                         const float scale,
+                         const struct vector3 color, const int screen_width, const int screen_height) {
+    const float start_x = x;
+    const float line_height = font->line_height * scale;
+
+    for (int i = 0; i < cursor && string[i]; i++) {
+        const int ch = (unsigned char) string[i];
+
+        if (ch == '\n') {
+            x = start_x;
+            y -= line_height;
+            continue;
+        }
+
+        if (ch < 128) {
+            x += (float) font->glyphs[ch].advance * scale;
+        }
+    }
+
+    const float cursor_width = 2.0f;
+    const float cursor_height = line_height;
+    const float ascender = (float) font->glyphs['A'].bearing_y * scale;
+    const float cursor_y = y - (line_height - ascender);
+
+    gl_draw_rect(x, cursor_y, cursor_width, cursor_height, color, screen_width, screen_height);
+}
+
+static const char *rect_vertex_source =
+        "#version 330 core\n"
+        "layout(location = 0) in vec2 a_position;\n"
+        "uniform mat4 u_projection;\n"
+        "void main() {\n"
+        "    gl_Position = u_projection * vec4(a_position, 0.0, 1.0);\n"
+        "}\n";
+
+static const char *rect_fragment_source =
+        "#version 330 core\n"
+        "uniform vec3 u_color;\n"
+        "out vec4 frag_color;\n"
+        "void main() {\n"
+        "    frag_color = vec4(u_color, 1.0);\n"
+        "}\n";
+
+
+static struct {
+    unsigned int program;
+    int u_projection;
+    int u_color;
+    unsigned int vao;
+    unsigned int vbo;
+} gl_rect;
+
+void rect_initialize(void) {
+    const unsigned int vertex = shader_create(GL_VERTEX_SHADER, rect_vertex_source);
+    const unsigned int fragment = shader_create(GL_FRAGMENT_SHADER, rect_fragment_source);
+
+    gl_rect.program = glCreateProgram();
+    glAttachShader(gl_rect.program, vertex);
+    glAttachShader(gl_rect.program, fragment);
+    glLinkProgram(gl_rect.program);
+
+    glDeleteShader(vertex);
+    glDeleteShader(fragment);
+
+    gl_rect.u_projection = glGetUniformLocation(gl_rect.program, "u_projection");
+    gl_rect.u_color = glGetUniformLocation(gl_rect.program, "u_color");
+
+    glGenVertexArrays(1, &gl_rect.vao);
+    glGenBuffers(1, &gl_rect.vbo);
+
+    glBindVertexArray(gl_rect.vao);
+    glBindBuffer(GL_ARRAY_BUFFER, gl_rect.vbo);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 12, NULL, GL_DYNAMIC_DRAW);
+    const int index = 0;
+    glEnableVertexAttribArray(index);
+    const int size = 2;
+    glVertexAttribPointer(index, size, GL_FLOAT, GL_FALSE, 2 * sizeof(float), 0);
+
+    const int buffer = 0;
+    glBindBuffer(GL_ARRAY_BUFFER, buffer);
+    const int array = 0;
+    glBindVertexArray(array);
+}
+
+void gl_draw_rect(const float x, const float y, const float width, const float height,
+                  const struct vector3 color,
+                  const int screen_width, const int screen_height) {
+    float projection[16] = {0};
+    projection[0] = 2.0f / (float) screen_width;
+    projection[5] = 2.0f / (float) screen_height;
+    projection[10] = -1.0f;
+    projection[12] = -1.0f;
+    projection[13] = -1.0f;
+    projection[15] = 1.0f;
+
+    const float vertices[12] = {
+        x, y,
+        x + width, y,
+        x + width, y + height,
+        x, y,
+        x + width, y + height,
+        x, y + height,
+    };
+
+    glDisable(GL_DEPTH_TEST);
+
+    glUseProgram(gl_rect.program);
+    const int matrix_count = 1;
+    glUniformMatrix4fv(gl_rect.u_projection, matrix_count, GL_FALSE, projection);
+    glUniform3f(gl_rect.u_color, color.x, color.y, color.z);
+
+    glBindVertexArray(gl_rect.vao);
+    glBindBuffer(GL_ARRAY_BUFFER, gl_rect.vbo);
+    const int offset = 0;
+    glBufferSubData(GL_ARRAY_BUFFER, offset, sizeof(vertices), vertices);
+
+    const int first = 0;
+    int arrays_count = 6;
+    glDrawArrays(GL_TRIANGLES, first, arrays_count);
+
+    const int buffer = 0;
+    glBindBuffer(GL_ARRAY_BUFFER, buffer);
+    const int array = 0;
+    glBindVertexArray(array);
+    glEnable(GL_DEPTH_TEST);
+}
+
 static void mesh1_create(void) {
     // a sphere is sliced like an orange, so slices is longitude, and then rings are stacked from top to bottom, so it
     // is latitude
@@ -404,6 +534,7 @@ void gl_initialize(void) {
     gl.u_color = glGetUniformLocation(gl.program, "u_color");
 
     mesh1_create();
+    rect_initialize();
 }
 
 void gl_clear(const float r, const float g, const float b, const float a) {
