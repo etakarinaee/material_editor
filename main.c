@@ -45,7 +45,6 @@ int main(void) {
         platform_swap_buffers(&platform);
     }
 
-    // TODO: draw text
     // TODO: basic text editor
 
 
