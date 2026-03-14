@@ -18,7 +18,7 @@ int main(void) {
 
     struct gl_font font;
 
-    result = gl_font_initialize(&font, "JetBrainsMono-Regular.ttf", 48);
+    result = gl_font_initialize(&font, "JetBrainsMono-Regular.ttf", 15);
 
     if (result != RESULT_SUCCESS) {
         fprintf(stderr, "%s\n", result_to_string(result));
@@ -79,11 +79,11 @@ int main(void) {
         const float text_x = 25.0f;
         const float text_y = (float) platform.height - 50.0f;
 
-        gl_font_draw(&font, text_editor.buffer, text_x, text_y, 0.3125f,
+        gl_font_draw(&font, text_editor.buffer, text_x, text_y, 1.0f,
                      vector3(1.0f, 1.0f, 1.0f), platform.width, platform.height);
 
         gl_font_draw_cursor(&font, text_editor.buffer, text_editor.cursor,
-                            text_x, text_y, 0.3125f,
+                            text_x, text_y, 1.0f,
                             vector3(1.0f, 1.0f, 1.0f), platform.width, platform.height);
 
         gl_clear_scissor();

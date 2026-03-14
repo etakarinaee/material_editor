@@ -84,10 +84,7 @@ static const char *text_fragment_source =
         "uniform sampler2D u_text;\n"
         "uniform vec3 u_text_color;\n"
         "void main() {\n"
-        "    float dist = texture(u_text, tex_coords).r;\n"
-        "    float edge = 0.5;\n"
-        "    float aa_width = fwidth(dist) * 0.75;\n"
-        "    float a = smoothstep(edge - aa_width, edge + aa_width, dist);\n"
+        "    float a = texture(u_text, tex_coords).r;\n"
         "    if (a < 0.01) discard;\n"
         "    frag_color = vec4(u_text_color, a);\n"
         "}\n";
@@ -115,11 +112,7 @@ material_editor_result gl_font_initialize(struct gl_font *font, const char *ttf,
     int atlas_height = 0;
 
     for (int i = 0; i < 128; i++) {
-        if (FT_Load_Char(face, i, FT_LOAD_DEFAULT)) {
-            continue;
-        }
-
-        if (FT_Render_Glyph(face->glyph, FT_RENDER_MODE_SDF)) {
+        if (FT_Load_Char(face, i, FT_LOAD_RENDER)) {
             continue;
         }
 
@@ -151,18 +144,14 @@ material_editor_result gl_font_initialize(struct gl_font *font, const char *ttf,
 
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
     int xoffset = 0;
     memset(font->glyphs, 0, sizeof(font->glyphs));
 
     for (int i = 0; i < 128; i++) {
-        if (FT_Load_Char(face, i, FT_LOAD_DEFAULT)) {
-            continue;
-        }
-
-        if (FT_Render_Glyph(face->glyph, FT_RENDER_MODE_SDF)) {
+        if (FT_Load_Char(face, i, FT_LOAD_RENDER)) {
             continue;
         }
 
@@ -193,7 +182,7 @@ material_editor_result gl_font_initialize(struct gl_font *font, const char *ttf,
         xoffset += glyph_width + GLYPH_PADDING;
     }
 
-    font->line_height = (float) font->glyphs['A'].height * 1.3f;
+    font->line_height = (float) font->glyphs['A'].height * 1.6f;
 
     glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
     glBindTexture(GL_TEXTURE_2D, 0);
@@ -224,9 +213,9 @@ material_editor_result gl_font_initialize(struct gl_font *font, const char *ttf,
     const void *data = 0;
     glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 6 * 4, data, GL_DYNAMIC_DRAW);
     const int index = 0;
-    glEnableVertexAttribArray(index);
     const int size = 4;
     glVertexAttribPointer(index, size, GL_FLOAT, GL_FALSE, 4 * sizeof(float), 0);
+    glEnableVertexAttribArray(index);
 
     const int buffer = 0;
     glBindBuffer(GL_ARRAY_BUFFER, buffer);
@@ -262,7 +251,7 @@ void gl_font_draw(const struct gl_font *font, const char *string, float x, float
     glBindVertexArray(font->vao);
 
     const float start_x = x;
-    const float line_height = (float) font->glyphs['A'].height * scale * 1.3f;
+    const float line_height = font->line_height;
 
     for (const char *c = string; *c; c++) {
         const int ch = (unsigned char) *c;
@@ -273,7 +262,9 @@ void gl_font_draw(const struct gl_font *font, const char *string, float x, float
             continue;
         }
 
-        if (ch >= 128) continue;
+        if (ch >= 128) {
+            continue;
+        }
 
         const struct gl_glyph *glyph = &font->glyphs[ch];
 
