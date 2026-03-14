@@ -25,7 +25,6 @@ int main(void) {
         platform_swap_buffers(&platform);
     }
 
-    // TODO: msaa
     // TODO: draw text
     // TODO: basic text editor
 
