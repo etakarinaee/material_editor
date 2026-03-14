@@ -15,12 +15,16 @@ int main(void) {
     gl_initialize();
 
     while (platform_update(&platform)) {
-        const float aspect_ratio = (float) platform.width / (float) platform.height;
-
-        gl_begin(vector3(0, 0, 3), vector3(0, 0, 0), aspect_ratio);
         gl_clear(0.1f, 0.1f, 0.1f, GL_OPAQUE);
 
-        gl_draw_mesh1(vector3(0, 0, 0), 1.0f, vector3(0.4f, 0.6f, 1.0f));
+        // preview has its own part of the screen
+        const int x = platform.width / 2;
+        const int width = platform.width / 2;
+        const float aspect = (float) width / (float) platform.height;
+
+        gl_set_viewport(x, 0, width, platform.height);
+        gl_begin(vector3(0, 0, 3), vector3(0, 0, 0), aspect);
+        gl_draw_mesh1(vector3(0, 0, 0), 0.5f, vector3(0.4f, 0.6f, 1.0f));
 
         platform_swap_buffers(&platform);
     }

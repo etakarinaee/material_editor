@@ -165,8 +165,8 @@ void gl_clear(const float r, const float g, const float b, const float a) {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
-void gl_set_viewport(const int width, const int height) {
-    glViewport(0, 0, width, height);
+void gl_set_viewport(const int x, const int y, const int width, const int height) {
+    glViewport(x, y, width, height);
 }
 
 void gl_begin(const struct vector3 camera_position, const struct vector3 look_at, const float aspect_ratio) {

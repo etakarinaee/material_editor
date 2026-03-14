@@ -152,7 +152,9 @@ bool platform_update(struct platform *platform) {
             case ConfigureNotify: {
                 platform->width = event.xconfigure.width;
                 platform->height = event.xconfigure.height;
-                gl_set_viewport(platform->width, platform->height);
+
+                const int x = 0, y = 0;
+                gl_set_viewport(x, y, platform->width, platform->height);
             }
             break;
 
