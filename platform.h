@@ -17,6 +17,10 @@ enum key {
     KEY_BACKSPACE,
     KEY_ENTER,
     KEY_TAB,
+    KEY_LEFT,
+    KEY_RIGHT,
+    KEY_UP,
+    KEY_DOWN,
     // this always must be last in the enum
     KEY_COUNT,
 };

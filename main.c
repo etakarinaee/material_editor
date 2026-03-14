@@ -47,6 +47,19 @@ int main(void) {
             text_editor_insert_char(&text_editor, ' ');
         }
 
+        if (platform.key_pressed[KEY_LEFT]) {
+            text_editor_move_left(&text_editor);
+        }
+        if (platform.key_pressed[KEY_RIGHT]) {
+            text_editor_move_right(&text_editor);
+        }
+        if (platform.key_pressed[KEY_UP]) {
+            text_editor_move_up(&text_editor);
+        }
+        if (platform.key_pressed[KEY_DOWN]) {
+            text_editor_move_down(&text_editor);
+        }
+
         gl_clear(0.1f, 0.1f, 0.1f, GL_OPAQUE);
 
         // preview has its own part of the screen
@@ -78,7 +91,6 @@ int main(void) {
         platform_swap_buffers(&platform);
     }
 
-    // TODO: cursor movement
     // TODO: line numbers
     // TODO: mouse interaction
 

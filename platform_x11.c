@@ -181,6 +181,19 @@ bool platform_update(struct platform *platform) {
                     case XK_Tab:
                         platform->key_pressed[KEY_TAB] = true;
                         break;
+                    case XK_Left:
+                        platform->key_pressed[KEY_LEFT] = true;
+                        break;
+                    case XK_Right:
+                        platform->key_pressed[KEY_RIGHT] = true;
+                        break;
+                    case XK_Up:
+                        platform->key_pressed[KEY_UP] = true;
+                        break;
+                    case XK_Down:
+                        platform->key_pressed[KEY_DOWN] = true;
+                        break;
+
                     default: {
                         // get text input
                         char buffer[8];
