@@ -2,8 +2,52 @@
 #define MATERIAL_EDITOR_GL_H
 
 #include "linalg.h"
+#include "result.h"
 
 #define GL_OPAQUE 1.0f
+
+struct gl_glyph {
+    // texture x offset in atlas
+    // [0..1]
+    float tx;
+    // texture y offset in atlas
+    // [0..1]
+    float ty;
+    // texture width in atlas
+    // [0..1]
+    float tw;
+    // texture height in atlas
+    // [0..1]
+    float th;
+    // bitmap width in pixels
+    int width;
+    // bitmap height in pixels
+    int height;
+    // left bearing
+    int bearing_x;
+    // top bearing
+    int bearing_y;
+    // horizontal advance in pixels
+    int advance;
+};
+
+struct gl_font {
+    unsigned int atlas_texture;
+    int atlas_width;
+    int atlas_height;
+    struct gl_glyph glyphs[128];
+
+    unsigned int program;
+    unsigned int vao;
+    unsigned int vbo;
+    int u_projection;
+    int u_text_color;
+};
+
+material_editor_result gl_font_initialize(struct gl_font *font, const char *ttf, int pixel_height);
+
+void gl_font_draw(const struct gl_font *font, const char *string, float x, float y, float scale, struct vector3 color,
+                  int screen_width, int screen_height);
 
 void gl_initialize(void);
 

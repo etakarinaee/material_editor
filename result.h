@@ -15,6 +15,9 @@ typedef int material_editor_result;
 
 #define RESULT_X11_ERROR_OPEN_DISPLAY (-200)
 
+#define RESULT_TTF_ERROR_INIT (-304)
+#define RESULT_TTF_ERROR_LOAD (-305)
+
 static inline const char *result_to_string(const material_editor_result result) {
     switch (result) {
         case RESULT_SUCCESS: {
@@ -43,6 +46,14 @@ static inline const char *result_to_string(const material_editor_result result) 
 
         case RESULT_GL_ERROR_NO_VISUAL: {
             return "could not find visual info";
+        }
+
+        case RESULT_TTF_ERROR_INIT: {
+            return "could not initialize TTF";
+        }
+
+        case RESULT_TTF_ERROR_LOAD: {
+            return "could not load a font file";
         }
 
         default: return "an unknown error has occurred";
