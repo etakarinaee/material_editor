@@ -7,8 +7,19 @@
 
 #ifdef __linux__
 #include <X11/Xlib.h>
+#include <X11/keysym.h>
 #include <GL/glx.h>
 #endif
+
+#define MAX_TEXT_INPUT 32
+
+enum key {
+    KEY_BACKSPACE,
+    KEY_ENTER,
+    KEY_TAB,
+    // this always must be last in the enum
+    KEY_COUNT,
+};
 
 struct gl {
 #ifdef __linux__
@@ -29,6 +40,10 @@ struct platform {
 
     int width;
     int height;
+
+    char text_input[MAX_TEXT_INPUT];
+    int text_input_length;
+    bool key_pressed[KEY_COUNT];
 };
 
 material_editor_result platform_initialize(struct platform *platform);

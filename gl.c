@@ -234,7 +234,7 @@ material_editor_result gl_font_initialize(struct gl_font *font, const char *ttf,
     return RESULT_SUCCESS;
 }
 
-void gl_font_draw(const struct gl_font *font, const char *string, float x, const float y, const float scale,
+void gl_font_draw(const struct gl_font *font, const char *string, float x, float y, const float scale,
                   const struct vector3 color,
                   const int screen_width, const int screen_height) {
     float projection[16] = {0};
@@ -259,8 +259,18 @@ void gl_font_draw(const struct gl_font *font, const char *string, float x, const
     glBindTexture(GL_TEXTURE_2D, font->atlas_texture);
     glBindVertexArray(font->vao);
 
+    const float start_x = x;
+    const float line_height = (float) font->glyphs['A'].height * scale * 1.3f;
+
     for (const char *c = string; *c; c++) {
         const int ch = (unsigned char) *c;
+
+        if (ch == '\n') {
+            x = start_x;
+            y -= line_height;
+            continue;
+        }
+
         if (ch >= 128) continue;
 
         const struct gl_glyph *glyph = &font->glyphs[ch];
@@ -403,6 +413,15 @@ void gl_clear(const float r, const float g, const float b, const float a) {
 
 void gl_set_viewport(const int x, const int y, const int width, const int height) {
     glViewport(x, y, width, height);
+}
+
+void gl_set_scissor(const int x, const int y, const int width, const int height) {
+    glEnable(GL_SCISSOR_TEST);
+    glScissor(x, y, width, height);
+}
+
+void gl_clear_scissor(void) {
+    glDisable(GL_SCISSOR_TEST);
 }
 
 void gl_begin(const struct vector3 camera_position, const struct vector3 look_at, const float aspect_ratio) {

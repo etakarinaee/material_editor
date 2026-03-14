@@ -1,3 +1,4 @@
+#include <string.h>
 #include <GL/glew.h>
 
 #include "platform.h"
@@ -144,6 +145,9 @@ material_editor_result platform_initialize(struct platform *platform) {
 }
 
 bool platform_update(struct platform *platform) {
+    platform->text_input_length = 0;
+    memset(platform->key_pressed, 0, sizeof(platform->key_pressed));
+
     while (XPending(platform->display)) {
         XEvent event;
         XNextEvent(platform->display, &event);
@@ -163,6 +167,39 @@ bool platform_update(struct platform *platform) {
                     return false;
                 }
             }
+
+            case KeyPress: {
+                const KeySym sym = XLookupKeysym(&event.xkey, 0);
+
+                switch (sym) {
+                    case XK_BackSpace:
+                        platform->key_pressed[KEY_BACKSPACE] = true;
+                        break;
+                    case XK_Return:
+                        platform->key_pressed[KEY_ENTER] = true;
+                        break;
+                    case XK_Tab:
+                        platform->key_pressed[KEY_TAB] = true;
+                        break;
+                    default: {
+                        // get text input
+                        char buffer[8];
+                        const int length = XLookupString(&event.xkey, buffer, sizeof(buffer), NULL, NULL);
+
+                        for (int i = 0; i < length; i++) {
+                            const char c = buffer[i];
+
+                            if (c >= 32 && c < 127) {
+                                if (platform->text_input_length < MAX_TEXT_INPUT) {
+                                    platform->text_input[platform->text_input_length++] = c;
+                                }
+                            }
+                        }
+                    }
+                    break;
+                }
+            }
+            break;
 
             default: break;
         }

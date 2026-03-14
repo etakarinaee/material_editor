@@ -55,6 +55,10 @@ void gl_clear(float r, float g, float b, float a);
 
 void gl_set_viewport(int x, int y, int width, int height);
 
+void gl_set_scissor(int x, int y, int width, int height);
+
+void gl_clear_scissor(void);
+
 // sets the camera state for the current frame
 void gl_begin(struct vector3 camera_position, struct vector3 look_at, float aspect_ratio);
 

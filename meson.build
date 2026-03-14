@@ -12,6 +12,7 @@ material_editor = executable('material_editor',
                              'main.c',
                              'platform_x11.c',
                              'gl.c',
+                             'text_editor.c',
                              dependencies : [
                                  x11_dep,
                                  gl_dep,
