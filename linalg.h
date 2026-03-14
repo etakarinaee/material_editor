@@ -90,4 +90,43 @@ static inline struct matrix4 matrix4_perspective(const float fov_degrees, const 
     return r;
 }
 
+static inline struct matrix4 matrix4_identity(void) {
+    struct matrix4 r = {0};
+    r.m[0] = 1.0f;
+    r.m[5] = 1.0f;
+    r.m[10] = 1.0f;
+    r.m[15] = 1.0f;
+    return r;
+}
+
+static inline struct matrix4 matrix4_translate(const struct vector3 t) {
+    struct matrix4 r = matrix4_identity();
+    r.m[12] = t.x;
+    r.m[13] = t.y;
+    r.m[14] = t.z;
+    return r;
+}
+
+static inline struct matrix4 matrix4_scale(const float s) {
+    struct matrix4 r = {0};
+    r.m[0] = s;
+    r.m[5] = s;
+    r.m[10] = s;
+    r.m[15] = 1.0f;
+    return r;
+}
+
+static inline struct matrix4 matrix4_multiply(const struct matrix4 a, const struct matrix4 b) {
+    struct matrix4 r = {0};
+    for (int c = 0; c < 4; c++) {
+        for (int row = 0; row < 4; row++) {
+            r.m[c * 4 + row] = a.m[row] * b.m[c * 4] +
+                               a.m[4 + row] * b.m[c * 4 + 1] +
+                               a.m[8 + row] * b.m[c * 4 + 2] +
+                               a.m[12 + row] * b.m[c * 4 + 3];
+        }
+    }
+    return r;
+}
+
 #endif //MATERIAL_EDITOR_MATH_H
