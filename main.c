@@ -13,8 +13,10 @@ int main(void) {
     }
 
     while (platform_update(&platform)) {
-        platform_swap_buffers(&platform);
         gl_clear(0.1f, 0.1f, 0.1f, GL_OPAQUE);
+        gl_begin(vector3(0, 0, 3), vector3(0, 0, 0), platform.width / platform.height);
+
+        platform_swap_buffers(&platform);
     }
 
     // TODO: draw a sphere

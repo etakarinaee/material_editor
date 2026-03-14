@@ -4,6 +4,8 @@
 
 #include <X11/Xlib.h>
 
+#include "gl.h"
+
 material_editor_result platform_initialize(struct platform *platform) {
     const char *name = 0;
     Display *display = XOpenDisplay(name);
@@ -148,6 +150,7 @@ bool platform_update(struct platform *platform) {
             case ConfigureNotify: {
                 platform->width = event.xconfigure.width;
                 platform->height = event.xconfigure.height;
+                gl_set_viewport(platform->width, platform->height);
             }
             break;
 
