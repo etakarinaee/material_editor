@@ -29,6 +29,7 @@ int main(void) {
     struct text_editor text_editor;
     text_editor_initialize(&text_editor);
 
+    // TODO: this is messed up, clean up
     while (platform_update(&platform)) {
         for (int i = 0; i < platform.text_input_length; i++) {
             text_editor_insert_char(&text_editor, platform.text_input[i]);
@@ -62,7 +63,9 @@ int main(void) {
 
         if (platform.mouse) {
             if (platform.mx < platform.width / 2) {
+                const float line_number_width = 40.0f;
                 const float text_x = 25.0f;
+                const float code_x = text_x + line_number_width;
                 const float text_y = (float) platform.height - 50.0f;
 
                 const float line_height = font.line_height;
@@ -72,7 +75,7 @@ int main(void) {
                 const float y = (float) (platform.height - platform.my);
 
                 text_editor_set_cursor_from_position(&text_editor, (float) platform.mx, y,
-                                                     text_x, text_y, line_height, char_width,
+                                                     code_x, text_y, line_height, char_width,
                                                      ascender);
             }
         }
@@ -95,12 +98,32 @@ int main(void) {
 
         const float text_x = 25.0f;
         const float text_y = (float) platform.height - 50.0f;
+        const float line_number_width = 40.0f;
+        const float code_x = text_x + line_number_width;
 
-        gl_font_draw(&font, text_editor.buffer, text_x, text_y, 1.0f,
+        int line_count = 1;
+        for (int i = 0; i < text_editor.length; i++) {
+            if (text_editor.buffer[i] == '\n') {
+                line_count++;
+            }
+        }
+
+        char line_number[16];
+        float line_y = text_y;
+        for (int i = 1; i <= line_count; i++) {
+            snprintf(line_number, sizeof(line_number), "%3d", i);
+
+            gl_font_draw(&font, line_number, text_x, line_y, 1.0f,
+                         vector3(0.5f, 0.5f, 0.5f), platform.width, platform.height);
+
+            line_y -= font.line_height;
+        }
+
+        gl_font_draw(&font, text_editor.buffer, code_x, text_y, 1.0f,
                      vector3(1.0f, 1.0f, 1.0f), platform.width, platform.height);
 
         gl_font_draw_cursor(&font, text_editor.buffer, text_editor.cursor,
-                            text_x, text_y, 1.0f,
+                            code_x, text_y, 1.0f,
                             vector3(1.0f, 1.0f, 1.0f), platform.width, platform.height);
 
         gl_clear_scissor();
@@ -108,7 +131,6 @@ int main(void) {
         platform_swap_buffers(&platform);
     }
 
-    // TODO: line numbers
     // TODO: selection (with cursor)
     // TODO: selection (with shortcuts)
     // TODO: selection (with cursor by lines)
