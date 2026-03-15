@@ -73,6 +73,15 @@ foo = sqrt(2.0)
 color = pow(foo, 2)
 ```
 
+#### Comments
+
+C++-style `//` comments are supported:
+
+```c++
+// this is something really important, please do not delete!
+something_important = 123
+```
+
 #### Built-in functions:
 
 TODO
