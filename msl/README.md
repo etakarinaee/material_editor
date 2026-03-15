@@ -84,7 +84,9 @@ something_important = 123
 
 #### Built-in functions:
 
-TODO
+TODO: document them
+
+`sin  lerp`
 
 #### Reserved keywords
 

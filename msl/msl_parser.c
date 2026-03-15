@@ -110,7 +110,7 @@ static struct MSL_node *parse_expression(struct MSL_parser *parser, const int mi
         if (parser->current.kind == TOKEN_KIND_LPAREN) {
             advance(parser);
 
-            left = MSL_node_alloc(NODE_KIND_IDENTIFIER, token.line);
+            left = MSL_node_alloc(NODE_KIND_CALL, token.line);
             left->name = token.string;
             left->name_length = token.length;
 
