@@ -61,7 +61,7 @@ material_editor_result platform_initialize(struct platform *platform) {
 
     XSetWindowAttributes set_window_attributes = {
         .colormap = platform->colormap,
-        .event_mask = ExposureMask | KeyPressMask | StructureNotifyMask,
+        .event_mask = ExposureMask | KeyPressMask | StructureNotifyMask | ButtonPressMask,
     };
 
     const int width = 1280, height = 720;
@@ -72,7 +72,7 @@ material_editor_result platform_initialize(struct platform *platform) {
                                      visual_info->visual, CWColormap | CWEventMask, &set_window_attributes);
 
     XStoreName(display, platform->window, "Material Editor");
-    XSelectInput(display, platform->window, ExposureMask | KeyPressMask | StructureNotifyMask);
+    XSelectInput(display, platform->window, ExposureMask | KeyPressMask | StructureNotifyMask | ButtonPressMask);
     XMapWindow(display, platform->window);
 
     const int only_if_exists = False;
@@ -146,6 +146,7 @@ material_editor_result platform_initialize(struct platform *platform) {
 
 bool platform_update(struct platform *platform) {
     platform->text_input_length = 0;
+    platform->mouse = false;
     memset(platform->key_pressed, 0, sizeof(platform->key_pressed));
 
     while (XPending(platform->display)) {
@@ -167,6 +168,16 @@ bool platform_update(struct platform *platform) {
                     return false;
                 }
             }
+            break;
+
+            case ButtonPress: {
+                if (event.xbutton.button == Button1) {
+                    platform->mouse = true;
+                    platform->mx = event.xbutton.x;
+                    platform->my = event.xbutton.y;
+                }
+            }
+            break;
 
             case KeyPress: {
                 const KeySym sym = XLookupKeysym(&event.xkey, 0);

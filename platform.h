@@ -48,6 +48,9 @@ struct platform {
     char text_input[MAX_TEXT_INPUT];
     int text_input_length;
     bool key_pressed[KEY_COUNT];
+
+    bool mouse;
+    int mx, my;
 };
 
 material_editor_result platform_initialize(struct platform *platform);

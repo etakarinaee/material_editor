@@ -23,4 +23,10 @@ void text_editor_move_up(struct text_editor *text_editor);
 
 void text_editor_move_down(struct text_editor *text_editor);
 
+void text_editor_set_cursor_from_position(struct text_editor *text_editor,
+                                          float cx, float cy,
+                                          float ox, float oy,
+                                          float line_height, float char_width,
+                                          float ascender);
+
 #endif //MATERIAL_EDITOR_TEXT_EDITOR_H

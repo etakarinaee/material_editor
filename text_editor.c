@@ -123,3 +123,51 @@ void text_editor_move_down(struct text_editor *text_editor) {
 
     text_editor->cursor = next_line_start + column;
 }
+
+void text_editor_set_cursor_from_position(struct text_editor *text_editor, const float cx, const float cy,
+                                          const float ox, const float oy,
+                                          const float line_height, const float char_width,
+                                          const float ascender) {
+    const float visual_top = oy + ascender;
+
+    int line = (int) ((visual_top - cy) / line_height);
+
+    if (line < 0) {
+        line = 0;
+    }
+
+
+    // which column?
+    int column = (int) ((cx - ox + char_width * 0.5f) / char_width);
+
+    if (column < 0) {
+        column = 0;
+    }
+
+    int current_line = 0;
+    int line_start = 0;
+
+    for (int i = 0; i < text_editor->length; i++) {
+        if (current_line == line) {
+            break;
+        }
+
+        if (text_editor->buffer[i] == '\n') {
+            current_line++;
+            line_start = i + 1;
+        }
+    }
+
+    int line_end = line_start;
+    while (line_end < text_editor->length && text_editor->buffer[line_end] != '\n') {
+        line_end++;
+    }
+
+    const int line_length = line_end - line_start;
+
+    if (column > line_length) {
+        column = line_length;
+    }
+
+    text_editor->cursor = line_start + column;
+}

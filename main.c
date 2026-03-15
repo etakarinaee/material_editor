@@ -60,6 +60,23 @@ int main(void) {
             text_editor_move_down(&text_editor);
         }
 
+        if (platform.mouse) {
+            if (platform.mx < platform.width / 2) {
+                const float text_x = 25.0f;
+                const float text_y = (float) platform.height - 50.0f;
+
+                const float line_height = font.line_height;
+                const float char_width = (float) font.glyphs['A'].advance;
+                const float ascender = (float) font.glyphs['A'].bearing_y;
+
+                const float y = (float) (platform.height - platform.my);
+
+                text_editor_set_cursor_from_position(&text_editor, (float) platform.mx, y,
+                                                     text_x, text_y, line_height, char_width,
+                                                     ascender);
+            }
+        }
+
         gl_clear(0.1f, 0.1f, 0.1f, GL_OPAQUE);
 
         // preview has its own part of the screen
@@ -92,7 +109,10 @@ int main(void) {
     }
 
     // TODO: line numbers
-    // TODO: mouse interaction
+    // TODO: selection (with cursor)
+    // TODO: selection (with shortcuts)
+    // TODO: selection (with cursor by lines)
+    // TODO: move lines up/down
 
     return 0;
 }
