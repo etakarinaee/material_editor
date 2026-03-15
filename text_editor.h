@@ -29,4 +29,8 @@ void text_editor_set_cursor_from_position(struct text_editor *text_editor,
                                           float line_height, float char_width,
                                           float ascender);
 
+void text_editor_put_line_up(struct text_editor *text_editor);
+
+void text_editor_put_line_down(struct text_editor *text_editor);
+
 #endif //MATERIAL_EDITOR_TEXT_EDITOR_H

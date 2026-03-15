@@ -147,6 +147,7 @@ material_editor_result platform_initialize(struct platform *platform) {
 bool platform_update(struct platform *platform) {
     platform->text_input_length = 0;
     platform->mouse = false;
+    platform->alt = false;
     memset(platform->key_pressed, 0, sizeof(platform->key_pressed));
 
     while (XPending(platform->display)) {
@@ -180,6 +181,8 @@ bool platform_update(struct platform *platform) {
             break;
 
             case KeyPress: {
+                platform->alt = (event.xkey.state & Mod1Mask) != 0;
+
                 const KeySym sym = XLookupKeysym(&event.xkey, 0);
 
                 switch (sym) {

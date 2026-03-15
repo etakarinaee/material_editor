@@ -171,3 +171,97 @@ void text_editor_set_cursor_from_position(struct text_editor *text_editor, const
 
     text_editor->cursor = line_start + column;
 }
+
+static int get_line_start(const struct text_editor *text_editor, int position) {
+    while (position > 0 && text_editor->buffer[position - 1] != '\n') {
+        position--;
+    }
+
+    return position;
+}
+
+static int get_line_end(const struct text_editor *text_editor, int position) {
+    while (position < text_editor->length && text_editor->buffer[position] != '\n') {
+        position++;
+    }
+
+    return position;
+}
+
+void text_editor_put_line_up(struct text_editor *text_editor) {
+    const int line_start = get_line_start(text_editor, text_editor->cursor);
+
+    if (line_start == 0) {
+        return;
+    }
+
+    const int line_end = get_line_end(text_editor, text_editor->cursor);
+    const int previous_line_start = get_line_start(text_editor, line_start - 1);
+
+    const int cursor_offset = text_editor->cursor - line_start;
+
+    const int previous_length = (line_start - 1) - previous_line_start;
+    const int current_length = line_end - line_start;
+    const int current_has_newline = (line_end < text_editor->length);
+
+    char previous[TEXT_EDITOR_MAX_SIZE];
+    char current[TEXT_EDITOR_MAX_SIZE];
+    memcpy(previous, &text_editor->buffer[previous_line_start], previous_length);
+    memcpy(current, &text_editor->buffer[line_start], current_length);
+
+    int position = previous_line_start;
+    memcpy(&text_editor->buffer[position], current, current_length);
+    position += current_length;
+
+    text_editor->buffer[position++] = '\n';
+    memcpy(&text_editor->buffer[position], previous, previous_length);
+    position += previous_length;
+
+    if (current_has_newline) {
+        text_editor->buffer[position] = '\n';
+    }
+
+    text_editor->buffer[text_editor->length] = '\0';
+
+    text_editor->cursor = previous_line_start + cursor_offset;
+}
+
+void text_editor_put_line_down(struct text_editor *text_editor) {
+    const int line_start = get_line_start(text_editor, text_editor->cursor);
+    const int line_end = get_line_end(text_editor, text_editor->cursor);
+
+    // already on last line
+    if (line_end >= text_editor->length) {
+        return;
+    }
+
+    const int next_line_start = line_end + 1;
+    const int next_line_end = get_line_end(text_editor, next_line_start);
+
+    const int cursor_offset = text_editor->cursor - line_start;
+
+    const int current_length = line_end - line_start;
+    const int next_length = next_line_end - next_line_start;
+    const int next_has_newline = (next_line_end < text_editor->length);
+
+    char current[TEXT_EDITOR_MAX_SIZE];
+    char next[TEXT_EDITOR_MAX_SIZE];
+    memcpy(current, &text_editor->buffer[line_start], current_length);
+    memcpy(next, &text_editor->buffer[next_line_start], next_length);
+
+    int position = line_start;
+    memcpy(&text_editor->buffer[position], next, next_length);
+    position += next_length;
+
+    text_editor->buffer[position++] = '\n';
+    memcpy(&text_editor->buffer[position], current, current_length);
+    position += current_length;
+
+    if (next_has_newline) {
+        text_editor->buffer[position] = '\n';
+    }
+
+    text_editor->buffer[text_editor->length] = '\0';
+
+    text_editor->cursor = line_start + next_length + 1 + cursor_offset;
+}

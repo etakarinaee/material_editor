@@ -51,6 +51,8 @@ struct platform {
 
     bool mouse;
     int mx, my;
+
+    bool alt;
 };
 
 material_editor_result platform_initialize(struct platform *platform);

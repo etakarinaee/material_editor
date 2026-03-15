@@ -55,10 +55,18 @@ int main(void) {
             text_editor_move_right(&text_editor);
         }
         if (platform.key_pressed[KEY_UP]) {
-            text_editor_move_up(&text_editor);
+            if (platform.alt) {
+                text_editor_put_line_up(&text_editor);
+            } else {
+                text_editor_move_up(&text_editor);
+            }
         }
         if (platform.key_pressed[KEY_DOWN]) {
-            text_editor_move_down(&text_editor);
+            if (platform.alt) {
+                text_editor_put_line_down(&text_editor);
+            } else {
+                text_editor_move_down(&text_editor);
+            }
         }
 
         if (platform.mouse) {
@@ -134,7 +142,6 @@ int main(void) {
     // TODO: selection (with cursor)
     // TODO: selection (with shortcuts)
     // TODO: selection (with cursor by lines)
-    // TODO: move lines up/down
 
     return 0;
 }
